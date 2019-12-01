@@ -1,5 +1,8 @@
 # Providence-City-Center-Model
 
+ <img src="https://raw.githubusercontent.com/lucasgelfond/Providence-City-Center-Model/master/City%20Center%20Image.jpg" alt="Newspaper Clipping of Plan for Providence City Center" width = "437" height = "674">
+ 
+
 Currently taking a fantastic class called Modern Architecture. It's taught by professor Dietrich Neumann at Brown University in the Histoy of Art and Architecture department. Its course code is HIAA 0850 and it's taught in the fall. 
 
 For our final project we were instructed to either design a model about a significan piece of architecture or write a paper about some architectural phenomenon. I immediately jumped at the idea of doing a model, especially because of the access we have through the Brown Design Workshop to 3D printers, laser cutters, etc.
