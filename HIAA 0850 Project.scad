@@ -1,6 +1,6 @@
     
     //Make sure that all differences are printable.
-    extraCutoff = 1;
+    extraCutoff = 0.01;
     
     //Amount of sides per cylinder. 
     $fn = 100;
@@ -39,12 +39,12 @@
     numberOfTinyCollumns = 8;
     
     //Loop that makes all of the ornamentation for the small collumns.
-    module tinyCollumns(height) {
+    module tinyCollumns(height, smallRadius, tinyRadius, protrusion) {
         for(i = [0: numberOfTinyCollumns]) {
         rotate( 
             (i * 360 / numberOfTinyCollumns) * 
             [0, 0, 1]) {
-                translate([smallCollumnRadius - tinyCollumnRadius / tinyCollumnProtrusion, 0, 0]) {
+                translate([smallRadius - tinyRadius / protrusion, 0, 0]) {
                     tinyCollumn(height);
                 }
             }
@@ -54,7 +54,7 @@
     //Puts small collumn together with ornamentation! 
     module smallCollumn(height) {
         smallCollumnBase(height);
-        tinyCollumns(height);
+        tinyCollumns(height, smallCollumnRadius, tinyCollumnRadius, tinyCollumnProtrusion);
     }
     
     
@@ -185,6 +185,65 @@ module threeRings() {
     }
 }
 
-threeRings();
-//translate([0, 0, partialCollumnHeight/2]) bigPartialCollumn();
+level0Radius = 180;
+level0NumberOfBoards = 10;
+level0CutOutHeight = 40;
+level0NonCutOutHeight = 200;
+kickboardWidthLevel0 = 30;
+
+//module createKickboards(xTrans, numberOfBoards, width, depth, height)
+
+level0Height = level0NonCutOutHeight + level0CutOutHeight;
+
+module bottomThing() {
+   difference() {
+    cylinder(r = level0Radius, h = level0Height, center = true);
+    translate([0,0, (level0NonCutOutHeight-kickboardWidthLevel0)/2 - extraCutoff]) { 
+     createKickboards(
+    level0Radius, 
+    level0NumberOfBoards, 
+    kickboardWidthLevel0, 
+    level0Radius * 5, 
+    level0CutOutHeight);
+    }
+   }
+}
+
+//    module tinyCollumns(height, smallRadius, tinyRadius, protrusion) {
+
+
+translate([bigCollumnRadius + middleTriangleThickness,0, -200]) middleCourtHouse();
+
+translate([0,0,-130]) bottomThing();
+
+translate([0,0,partialCollumnHeight]) threeRings();
+translate([0, 0, partialCollumnHeight/2]) bigPartialCollumn();
+
+middleTriangleRadius = 200;
+middleTriangleThickness = 40;
+middleCollumnHeight = 120;
+middleCollumnWidth = 25;
+middleTinyCollumnWidth = 5;
+middleCollumnProtrusion = 2;
+
+
+module middleCourtHouse() {
+    translate([-middleTriangleThickness/2,0, middleTriangleRadius/2]) {
+        scale([1, 1, 0.4])  {
+            rotate([90, 30, 90]) {
+                cylinder(r = middleTriangleRadius, h = middleTriangleThickness, $fn = 3);
+            }
+        }
+    }
+    //middle
+    tinyCollumns(middleCollumnHeight, middleTinyCollumnWidth, middleCollumnWidth, middleCollumnProtrusion);
+    
+    for(i = [-1, 1]) { 
+        translate([0, (middleTriangleRadius*3/5)*i,0]) {
+                tinyCollumns(middleCollumnHeight, middleTinyCollumnWidth, middleCollumnWidth, middleCollumnProtrusion);
+        }
+    }
+}
+
+
 
