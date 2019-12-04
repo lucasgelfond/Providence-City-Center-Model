@@ -3,7 +3,7 @@
     extraCutoff = 0.01;
     
     //Amount of sides per cylinder. 
-    $fn = 100;
+    $fn = 30;
     
     //How much of the collumns to show. Play with this to change appearence of small collumns.
     tinyCollumnProtrusion = 1.35;
