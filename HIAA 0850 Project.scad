@@ -11,7 +11,7 @@
     extremeCutoff = 100000;
     
     //Amount of sides per cylinder. 
-    $fn = 100;
+    $fn = 30;
     
     
     
@@ -409,7 +409,7 @@ module middleCourtHouse() {
 //GLOBAL STAGING
 
 module currentRender() {
-    translate([sectionARadius + middleTriangleThickness,0, -200]) middleCourtHouse();
+    //translate([sectionARadius + middleTriangleThickness,0, -200]) middleCourtHouse();
     translate([0,0,(level0Height+sectionAThickness)/-2]) {
         sectionF();
     }
