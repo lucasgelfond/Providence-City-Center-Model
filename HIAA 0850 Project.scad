@@ -6,76 +6,50 @@
     //Make sure that all differences are printable.
     extraCutoff = 0.01;
     
+    
+    //i'm so lazy lmao this is for stuff that won't cutoff hey man as long as it compiles
+    extremeCutoff = 100000;
+    
     //Amount of sides per cylinder. 
     $fn = 30;
-    
-    //Tiny collumn that ornaments small collumns on partial piece! 
-    module tinyCollumn(radius, height) {
-        cylinder(r = radius, h = height, center = true);
-    }
     
     
     
     //Loop that makes all of the ornamentation for the small collumns.
-    module tinyCollumns(height, smallRadius, tinyRadius, protrusion) {
-        for(i = [0: sectionANumberOfOrnamentalCollumns]) {
+    module tinyCollumns(collumnHeight, smallRadius, tinyRadius, protrusion, numCollumns) {
+        for(i = [0: numCollumns]) {
             rotate( 
-                (i * 360 / sectionANumberOfOrnamentalCollumns) * 
+                (i * 360 / numCollumns) * 
                 [0, 0, 1]) {
-                    translate([smallRadius - tinyRadius * protrusion, 0, 0]) {
-                        tinyCollumn(tinyRadius, height);
+                    translate([smallRadius - (tinyRadius * protrusion), 0, 0]) {
+                        cylinder(r = tinyRadius, h = collumnHeight, center = true);
                     }
                 }
             }
     }
     
     
-    /*
-    These are used mostly by sections B and F, but may be used
-    elsewhere so I'm including them up here globally.
-    */
-    
-    //These are each level of the sort of "cake toppers" in section B
-module createWindowedCylinder(numberOfBoards, ringRadius, ringThickness, middleRadius, middleThickness, width, depth) {
-    translate([0,0, ringThickness/2]) {
-        //adds bottom thick part
-        sectionBRing(ringRadius, ringThickness);
-    }
-    //top skinnier part
-    translate([0,0, ringThickness + middleThickness/2]) { 
-        difference() {
-            //adds ring
-            sectionBRing(middleRadius, middleThickness);
-            //adds cutouts 
-            translate([0, 0, middleThickness/-4]) createKickboards(ringRadius, numberOfBoards, width, depth, middleThickness);
-        }
-    }
-}
-
-
-        //Creates a series of kickboard shapes to use around a cylinder
-module createKickboards(xTrans, numberOfBoards, width, depth, height) {    
-    for(i = [0: numberOfBoards]) {
-          rotate((i * 360 / numberOfBoards) * [0, 0, 1]) {
-                translate([xTrans, 0, 0]) {
-                    rotate([0,0,90]) kickboard(width, depth, height); 
+    //Creates a series of kickboard shapes to use around a cylinder
+    module createKickboards(xTrans, numberOfBoards, width, depth, height) {    
+        for(i = [0: numberOfBoards]) {
+              rotate((i * 360 / numberOfBoards) * [0, 0, 1]) {
+                    translate([xTrans, 0, 0]) {
+                        rotate([0,0,90]) kickboard(width, depth, height); 
+                }
             }
         }
     }
-}
 
-module kickboard(width, depth, height) {
-    union() {
-        cube([width, depth, height - width/2], center = true);
-        translate([0,0, (height - width/2) / 2]) {
-            rotate([0, 90, 90]) {
-                cylinder(r = width/2, h = depth, center = true);
+    module kickboard(width, depth, height) {
+        union() {
+            cube([width, depth, height - width/2], center = true);
+            translate([0,0, (height - width/2) / 2]) {
+                rotate([0, 90, 90]) {
+                    cylinder(r = width/2, h = depth, center = true);
+                }
             }
         }
     }
-}
-
-
 
 
     
@@ -106,7 +80,7 @@ module kickboard(width, depth, height) {
     module sectionACollumns(height) {
         difference() {
         cylinder(r = sectionASmallCollumnRadius, h = height, center = true);
-        tinyCollumns(height+extraCutoff, sectionASmallCollumnRadius, sectionAOrnamentationRadius, sectionAOrnamentationProtrusion);
+        tinyCollumns(height+extraCutoff, sectionASmallCollumnRadius, sectionAOrnamentationRadius, sectionAOrnamentationProtrusion, sectionANumberOfOrnamentalCollumns);
         }
     }
     
@@ -138,7 +112,9 @@ sectionAThickness = 20;
     sectionARings();
 }
 
-/* BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                      CODE OF PERTINENCE TO SECTION B  
+/* 
+    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                      
+                        CODE OF PERTINENCE TO SECTION B  
     BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
 */
     
@@ -147,6 +123,29 @@ sectionAThickness = 20;
 module sectionBRing(radius, thickness) { 
     cylinder(r = radius, h = thickness, center = true);
 }
+
+   /*
+    These are used mostly by sections B and F, but may be used
+    elsewhere so I'm including them up here globally.
+    */
+    
+    //These are each level of the sort of "cake toppers" in section B
+module createWindowedCylinder(numberOfBoards, ringRadius, ringThickness, middleRadius, middleThickness, width, depth) {
+    translate([0,0, ringThickness/2]) {
+        //adds bottom thick part
+        sectionBRing(ringRadius, ringThickness);
+    }
+    //top skinnier part
+    translate([0,0, ringThickness + middleThickness/2]) { 
+        difference() {
+            //adds ring
+            sectionBRing(middleRadius, middleThickness);
+            //adds cutouts 
+            translate([0, 0, middleThickness/-4]) createKickboards(ringRadius, numberOfBoards, width, depth, middleThickness);
+        }
+    }
+}
+
 
 
 numberOfBoardsLevel2 = 16;
@@ -209,6 +208,83 @@ module sectionB() {
     }
 }
 
+/* 
+    DEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDE
+                        CODE OF PERTINENCE TO SECTIONS D & E
+    DEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDE
+*/
+
+//    module kickboard(width, depth, height) {
+
+
+   DFWindowLength = 10;
+   DFSmallKickboardWidth = 3;
+   DFWindowKickboards = 3;
+   DFWindowMiddleHeight = 5;
+   DFWindowCrustThickness = 1;
+   DFKickboardSandwichDepth = 5;
+   DFKickboardImprint = 0.5;
+
+DFWindowFullThick = DFWindowMiddleHeight + DFWindowCrustThickness;
+
+   module kickboardSandwich() {
+       difference() {
+           cube([DFWindowLength, DFKickboardSandwichDepth, DFWindowFullThick], center = true);
+           translate([
+               (DFWindowLength + DFWindowLength / DFWindowKickboards)/-2, 
+               (DFKickboardSandwichDepth*DFKickboardImprint)/2, 
+               DFWindowCrustThickness/-2])
+           {
+               for(i = [1 : DFWindowKickboards]) {
+                   translate([DFWindowLength/DFWindowKickboards * i, 0, 0]) {
+                    kickboard(DFSmallKickboardWidth, 
+                       DFKickboardImprint*DFKickboardSandwichDepth + extraCutoff, 
+                       DFWindowMiddleHeight);
+                   }
+               }
+           }
+       }
+   }
+   
+   // module tinyCollumns(collumnHeight, smallRadius, tinyRadius, protrusion, numCollumns) {
+
+masoleumTinyOrnaments = 8;
+masoleumTinyOrnamentRadius = 1.5;
+masoleumCollumnOrnamentationProtrusion =  -0.4;
+masoluemCollumnRadius = 5;
+bigMasHeight = 50;
+
+numMasoleumThings = 5;
+
+masoleumLength = (DFWindowFullThick * numMasoleumThings) + 
+   (masoluemCollumnRadius*2 * (numMasoleumThings + 1));
+
+   masoleum();
+
+
+   module masoleumCollumns(collumnHeight, length, numberOfParts) {
+       difference() {
+           cylinder(r = masoluemCollumnRadius, h = collumnHeight, center = true);
+           //IF THERE ARE PROBLEMS WITH STL CHECK HERE
+           tinyCollumns(extremeCutoff, masoluemCollumnRadius, masoleumTinyOrnamentRadius, masoleumCollumnOrnamentationProtrusion, masoleumTinyOrnaments);
+       }
+   }
+   
+     
+   module masoleum() {
+       translate([masoleumLength/-2,0,0]) {
+           for(i = [0: numMasoleumThings]) {
+               translate([(masoleumLength/(numMasoleumThings)), 0, 0] * i) masoleumCollumns(bigMasHeight, masoleumLength, numMasoleumThings);
+           }
+       
+       for(i = [1: numMasoleumThings]) {
+           translate([(masoluemCollumnRadius * (i -1) + DFWindowLength/2*i) * 2, 0, (bigMasHeight-DFWindowFullThick)/2]) {
+                   kickboardSandwich();
+           }
+       }
+   }
+   }
+  
 
 
 /* 
@@ -267,7 +343,7 @@ module currentRender() {
     translate([0, 0, sectionAHeight/2]) sectionA();
 }
 
-currentRender();
+//currentRender();
 
 
 
