@@ -28,6 +28,30 @@
                 }
             }
     }
+    
+    
+    /*
+    These are used mostly by sections B and F, but may be used
+    elsewhere so I'm including them up here globally.
+    */
+    
+    //These are each level of the sort of "cake toppers" in section B
+module createWindowedCylinder(numberOfBoards, ringRadius, ringThickness, middleRadius, middleThickness, width, depth) {
+    translate([0,0, ringThickness/2]) {
+        //adds bottom thick part
+        sectionBRing(ringRadius, ringThickness);
+    }
+    //top skinnier part
+    translate([0,0, ringThickness + middleThickness/2]) { 
+        difference() {
+            //adds ring
+            sectionBRing(middleRadius, middleThickness);
+            //adds cutouts 
+            translate([0, 0, middleThickness/-4]) createKickboards(ringRadius, numberOfBoards, width, depth, middleThickness);
+        }
+    }
+}
+
 
         //Creates a series of kickboard shapes to use around a cylinder
 module createKickboards(xTrans, numberOfBoards, width, depth, height) {    
@@ -39,6 +63,21 @@ module createKickboards(xTrans, numberOfBoards, width, depth, height) {
         }
     }
 }
+
+module kickboard(width, depth, height) {
+    union() {
+        cube([width, depth, height - width/2], center = true);
+        translate([0,0, (height - width/2) / 2]) {
+            rotate([0, 90, 90]) {
+                cylinder(r = width/2, h = depth, center = true);
+            }
+        }
+    }
+}
+
+
+
+
     
  /*
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -105,34 +144,10 @@ sectionAThickness = 20;
     
 
 
-
-module makeRing(radius, thickness) { 
+module sectionBRing(radius, thickness) { 
     cylinder(r = radius, h = thickness, center = true);
 }
 
-module createHalfWafer(numberOfBoards, ringRadius, ringThickness, middleRadius, middleThickness, width, depth) {
-    translate([0,0, ringThickness/2]) {
-        makeRing(ringRadius, ringThickness);
-    }
-    translate([0,0, ringThickness + middleThickness/2]) { 
-        difference() {
-            makeRing(middleRadius, middleThickness);
-            translate([0, 0, middleThickness/-4]) createKickboards(ringRadius, numberOfBoards, width, depth, middleThickness);
-        }
-    }
-}
-
-
-module kickboard(width, depth, height) {
-    union() {
-        cube([width, depth, height - width/2], center = true);
-        translate([0,0, (height - width/2) / 2]) {
-            rotate([0, 90, 90]) {
-                cylinder(r = width/2, h = depth, center = true);
-            }
-        }
-    }
-}
 
 numberOfBoardsLevel2 = 16;
 level2Radius = 150;
@@ -155,40 +170,40 @@ ring4Thickness = 20;
 level4Height = 135;
 kickboardWidthLevel4 = 40;
 
-topHalfWaferCut = 1;
+sectionBWaferCut = 1;
 
-module threeRings() {
+module sectionB() {
     rotate([0,0,35]) {
-        createHalfWafer(
+        createWindowedCylinder(
         numberOfBoardsLevel2, 
         ring2Radius, 
         ring2Thickness, 
         level2Radius, 
         level2Height, 
         kickboardWidthLevel2, 
-        ring2Radius * topHalfWaferCut);
+        ring2Radius * sectionBWaferCut);
     }
     translate([0, 0, level2Height + ring2Thickness]) { 
         rotate([0, 0, 0]) {
-            createHalfWafer(
+            createWindowedCylinder(
             numberOfBoardsLevel3,
             ring3Radius, 
             ring3Thickness,
             level3Radius, 
             level3Height,
             kickboardWidthLevel3,
-            ring3Radius * topHalfWaferCut);
+            ring3Radius * sectionBWaferCut);
         }
         translate([0,0,level3Height + ring3Thickness]) {
             rotate([0,0,0]) {
-                createHalfWafer(
+                createWindowedCylinder(
                 numberOfBoardsLevel4,
                 ring4Radius,
                 ring4Thickness,
                 level4Radius,
                 level4Height,
                 kickboardWidthLevel4,
-                ring4Radius * topHalfWaferCut);
+                ring4Radius * sectionBWaferCut);
             }
         }
     }
@@ -211,7 +226,7 @@ kickboardWidthLevel0 = 30;
 level0Height = level0NonCutOutHeight + level0CutOutHeight;
     
 
-module bottomThing() {
+module sectionF() {
    difference() {
     cylinder(r = level0Radius, h = level0Height, center = true);
     translate([0,0, (level0NonCutOutHeight-kickboardWidthLevel0)/2 - extraCutoff]) { 
@@ -243,22 +258,17 @@ module middleCourtHouse() {
     }
 }
 
+//GLOBAL STAGING
+
 module currentRender() {
     translate([sectionARadius + middleTriangleThickness,0, -200]) middleCourtHouse();
-    translate([0,0,-130]) bottomThing();
-    translate([0,0,sectionAHeight]) threeRings();
+    translate([0,0,-130]) sectionF();
+    translate([0,0,sectionAHeight]) sectionB();
     translate([0, 0, sectionAHeight/2]) sectionA();
 }
 
 currentRender();
 
-//    module tinyCollumns(height, smallRadius, tinyRadius, protrusion) {
 
 
-module ornamentedCollumn(height, collumnOuterRadius, collumnOrnamentRadius, protrusion) {
-    difference() {
-        
-            tinyCollumns(height, collumnOuterRadius, collumnOrnamentalRadius, protrusion);
-    }
-} 
 
