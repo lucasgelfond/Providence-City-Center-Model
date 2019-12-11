@@ -216,51 +216,81 @@ module sectionB() {
 
 //    module kickboard(width, depth, height) {
 
+masoleumTinyOrnaments = 8;
+masoleumTinyOrnamentRadius = 8;
+masoleumCollumnOrnamentationProtrusion =  -0.4;
+masoluemCollumnRadius = 30;
+bigMasHeight = 175;
 
-   DFWindowLength = 10;
-   DFSmallKickboardWidth = 3;
+numMasoleumThings = 3;
+
+//to be completely honest, a lot of the alignments get fucked up when you play with these, but I don't need to debug them (yet) so I'm going to leave them
+
+   DFWindowLength = 50;
+   DFSmallKickboardWidth = 10;
    DFWindowKickboards = 3;
-   DFWindowMiddleHeight = 5;
-   DFWindowCrustThickness = 1;
-   DFKickboardSandwichDepth = 5;
-   DFKickboardImprint = 0.5;
+   DFWindowMiddleHeight = 25;
+   DFWindowCrustThickness = 10;
+   DFKickboardSandwichDepth = 150;
+   
+   //I've been debugging these FOREVER and they don't work, I'm honestly just going to leave them and deal with it later
+   DFSmallKickboardImprint = 0.3;
+   DFBigKickboardImprint = 1;
 
-DFWindowFullThick = DFWindowMiddleHeight + DFWindowCrustThickness;
+   DFWindowCollumnExtra = 50;
+   DFWindowOverlap = -20;
+
+   DFWindowFullThick = DFWindowMiddleHeight + DFWindowCrustThickness;
+   DFKickboardArchHeight = bigMasHeight - DFWindowFullThick;
+   DFKickboardArchExtraVertical = 3;
+   
+   //    module kickboard(width, depth, height) {
+
+   
+module kickboardArch() {
+       difference() {
+       cube([DFWindowLength + DFWindowCollumnExtra * 2, DFKickboardSandwichDepth, DFKickboardArchHeight], center = true);
+           translate([0, 
+           (DFKickboardSandwichDepth)/2 + (DFKickboardSandwichDepth * DFBigKickboardImprint)/-2, 
+           (DFWindowMiddleHeight+DFKickboardArchExtraVertical+extraCutoff)/-2]) {
+            kickboard(DFWindowLength, DFBigKickboardImprint*DFKickboardSandwichDepth + extraCutoff, DFKickboardArchHeight-DFKickboardArchExtraVertical + extraCutoff);     
+           }
+       }
+       
+   }
+
+
 
    module kickboardSandwich() {
        difference() {
-           cube([DFWindowLength, DFKickboardSandwichDepth, DFWindowFullThick], center = true);
-           translate([
-               (DFWindowLength + DFWindowLength / DFWindowKickboards)/-2, 
-               (DFKickboardSandwichDepth*DFKickboardImprint)/2, 
-               DFWindowCrustThickness/-2])
-           {
+           cube([DFWindowLength + DFWindowCollumnExtra * 2, DFKickboardSandwichDepth, DFWindowFullThick], center = true);
+           translate(
+               [(DFWindowLength - DFWindowOverlap/2 + DFWindowLength / DFWindowKickboards)/-2 - DFWindowOverlap/4, 
+              ((DFBigKickboardImprint*DFKickboardSandwichDepth)/2 + 
+           (DFSmallKickboardImprint * DFKickboardSandwichDepth)/-2), 
+               DFWindowCrustThickness/-2]) {
+           
                for(i = [1 : DFWindowKickboards]) {
-                   translate([DFWindowLength/DFWindowKickboards * i, 0, 0]) {
+                   translate([DFWindowLength/DFWindowKickboards * i,    
+                    0,
+                   , 0]) {
                     kickboard(DFSmallKickboardWidth, 
-                       DFKickboardImprint*DFKickboardSandwichDepth + extraCutoff, 
+                       DFSmallKickboardImprint*DFKickboardSandwichDepth + extraCutoff, 
                        DFWindowMiddleHeight);
                    }
                }
            }
        }
+       translate([0,0, bigMasHeight/-2]) kickboardArch();
+       
    }
+   
    
    // module tinyCollumns(collumnHeight, smallRadius, tinyRadius, protrusion, numCollumns) {
 
-masoleumTinyOrnaments = 8;
-masoleumTinyOrnamentRadius = 1.5;
-masoleumCollumnOrnamentationProtrusion =  -0.4;
-masoluemCollumnRadius = 5;
-bigMasHeight = 50;
-
-numMasoleumThings = 5;
 
 masoleumLength = (DFWindowFullThick * numMasoleumThings) + 
    (masoluemCollumnRadius*2 * (numMasoleumThings + 1));
-
-   masoleum();
-
 
    module masoleumCollumns(collumnHeight, length, numberOfParts) {
        difference() {
@@ -270,15 +300,25 @@ masoleumLength = (DFWindowFullThick * numMasoleumThings) +
        }
    }
    
+   currentRender();
+
+ translate([0,500,0]) masoleum();
+   
+   kickboardSandwich();
      
    module masoleum() {
-       translate([masoleumLength/-2,0,0]) {
+       translate([0,0,0]) {
            for(i = [0: numMasoleumThings]) {
-               translate([(masoleumLength/(numMasoleumThings)), 0, 0] * i) masoleumCollumns(bigMasHeight, masoleumLength, numMasoleumThings);
+               translate([(masoluemCollumnRadius * 2 + DFWindowLength - DFWindowOverlap) , 0, 0] * i) {
+                   masoleumCollumns(bigMasHeight, masoleumLength, numMasoleumThings);
+               }
            }
        
        for(i = [1: numMasoleumThings]) {
-           translate([(masoluemCollumnRadius * (i -1) + DFWindowLength/2*i) * 2, 0, (bigMasHeight-DFWindowFullThick)/2]) {
+           translate([
+               (masoluemCollumnRadius) * 2 * (i-0.5) + DFWindowLength * (i-0.5) - DFWindowOverlap * i + DFWindowOverlap/2, 
+               DFKickboardSandwichDepth/-2, 
+               (bigMasHeight-DFWindowFullThick)/2]) {
                    kickboardSandwich();
            }
        }
@@ -341,9 +381,10 @@ module currentRender() {
     translate([0,0,-130]) sectionF();
     translate([0,0,sectionAHeight]) sectionB();
     translate([0, 0, sectionAHeight/2]) sectionA();
-}
+       
 
-//currentRender();
+
+}
 
 
 
