@@ -1,95 +1,35 @@
-    
+   
+/*
+    CODE OF GLOBAL IMPORTANCE
+*/
+  
     //Make sure that all differences are printable.
     extraCutoff = 0.01;
     
     //Amount of sides per cylinder. 
     $fn = 30;
     
-    //How much of the collumns to show. Play with this to change appearence of small collumns.
-    tinyCollumnProtrusion = 1.35;
-    
-    
-    numberOfSmallCollumns = 15;
-    bigCollumnRadius = 150;
-    smallCollumnProtrusion = 100;
-    
-    
-
-    //Radius of ornamentation on surrounding collumns.
-    tinyCollumnRadius = 8;
-    
-    //Height of the  partial portion with tiny/small/big collumn ornamentation scheme.
-    partialCollumnHeight = 750;
-    
     //Tiny collumn that ornaments small collumns on partial piece! 
-    module tinyCollumn(height) {
-        cylinder(r = tinyCollumnRadius, h = height, center = true);
+    module tinyCollumn(radius, height) {
+        cylinder(r = radius, h = height, center = true);
     }
     
     
-    //Radius of the ornamental collumns that run partially up the building.
-    smallCollumnRadius = 20;
-
-    //Base cylinder for small Collumn
-    module smallCollumnBase(height) {
-        cylinder(r = smallCollumnRadius, h = height, center = true);
-    }
-        
-   //Number of collumns ornamented on each small collumn.
-    numberOfTinyCollumns = 8;
     
     //Loop that makes all of the ornamentation for the small collumns.
     module tinyCollumns(height, smallRadius, tinyRadius, protrusion) {
-        for(i = [0: numberOfTinyCollumns]) {
-        rotate( 
-            (i * 360 / numberOfTinyCollumns) * 
-            [0, 0, 1]) {
-                translate([smallRadius - tinyRadius / protrusion, 0, 0]) {
-                    tinyCollumn(height);
+        for(i = [0: sectionANumberOfOrnamentalCollumns]) {
+            rotate( 
+                (i * 360 / sectionANumberOfOrnamentalCollumns) * 
+                [0, 0, 1]) {
+                    translate([smallRadius - tinyRadius * protrusion, 0, 0]) {
+                        tinyCollumn(tinyRadius, height);
+                    }
                 }
             }
-        }
     }
-    
-    //Puts small collumn together with ornamentation! 
-    module smallCollumn(height) {
-        smallCollumnBase(height);
-        tinyCollumns(height, smallCollumnRadius, tinyCollumnRadius, tinyCollumnProtrusion);
-    }
-    
-    
-bottomSectionNumberOfRings = 8;
-bottomSectionRingBulge = 20;
-bottomSectionThickness = 20;
-module bigRings() {
-    for(i = [0: bottomSectionNumberOfRings]) {
-        translate([0,0, partialCollumnHeight/bottomSectionNumberOfRings * i - 
-        partialCollumnHeight / 2]) {
-            cylinder(r = bigCollumnRadius + bottomSectionRingBulge, h = bottomSectionThickness, center = true);
-        }
-    }
-}
-    //Creates big section with the double ornamentation and adds small collumns around it
-    module bigPartialCollumn() {
-        cylinder(r = bigCollumnRadius, h = partialCollumnHeight,
-        center = true);
-        for(i = [0: numberOfSmallCollumns]) {
-            rotate(
-            (i * 360 / numberOfSmallCollumns) * [0, 0, 1]) {
-                translate([bigCollumnRadius - smallCollumnRadius / smallCollumnProtrusion, 0, 0]) {
-                    smallCollumn(partialCollumnHeight);
-            }
-        }
-    }
-    bigRings();
-}
 
-
-
-module makeRing(radius, thickness) { 
-    cylinder(r = radius, h = thickness, center = true);
-}
-
+        //Creates a series of kickboard shapes to use around a cylinder
 module createKickboards(xTrans, numberOfBoards, width, depth, height) {    
     for(i = [0: numberOfBoards]) {
           rotate((i * 360 / numberOfBoards) * [0, 0, 1]) {
@@ -98,6 +38,76 @@ module createKickboards(xTrans, numberOfBoards, width, depth, height) {
             }
         }
     }
+}
+    
+ /*
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                    CODE OF PERTINENCE TO SECTION A  
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+*/
+    sectionARadius = 150;
+    sectionAHeight = 750;
+    sectionASmallCollumnRadius = 20;
+
+    
+    //Play with these to change the look of the ornamental collumns
+    sectionAOrnamentationProtrusion = -0.625;
+    sectionALargeCollumnProtrusion = 100;
+
+   //Radius of the ornamentation cut out of the small large collumns
+    sectionAOrnamentationRadius = 8;
+    
+    //Number of ornamented collumns in section A
+    sectionAOrnamentalCollumns = 15;
+    
+    //Number of cylinders with which to apply ornamentation in Section A
+    sectionANumberOfOrnamentalCollumns = 8;
+
+      
+    module sectionACollumns(height) {
+        difference() {
+        cylinder(r = sectionASmallCollumnRadius, h = height, center = true);
+        tinyCollumns(height+extraCutoff, sectionASmallCollumnRadius, sectionAOrnamentationRadius, sectionAOrnamentationProtrusion);
+        }
+    }
+    
+sectionANumberOfRings = 8;
+sectionARingBulge = 25;
+sectionAThickness = 20;
+   
+    //Ornamental bands around the section A
+    module sectionARings() {
+        for(i = [0: sectionANumberOfRings]) {
+            translate([0,0, sectionAHeight/sectionANumberOfRings * i - 
+            sectionAHeight / 2]) {
+                cylinder(r = sectionARadius + sectionARingBulge, h = sectionAThickness, center = true);
+            }
+        }
+    }      
+    //Creates big section with the double ornamentation and adds small collumns around it
+    module sectionA() {
+        cylinder(r = sectionARadius, h = sectionAHeight,
+        center = true);
+        for(i = [0: sectionAOrnamentalCollumns]) {
+            rotate(
+            (i * 360 / sectionAOrnamentalCollumns) * [0, 0, 1]) {
+                translate([sectionARadius - sectionASmallCollumnRadius / sectionALargeCollumnProtrusion, 0, 0]) {
+                    sectionACollumns(sectionAHeight);
+            }
+        }
+    }
+    sectionARings();
+}
+
+/* BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB                      CODE OF PERTINENCE TO SECTION B  
+    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+*/
+    
+
+
+
+module makeRing(radius, thickness) { 
+    cylinder(r = radius, h = thickness, center = true);
 }
 
 module createHalfWafer(numberOfBoards, ringRadius, ringThickness, middleRadius, middleThickness, width, depth) {
@@ -124,7 +134,6 @@ module kickboard(width, depth, height) {
     }
 }
 
-
 numberOfBoardsLevel2 = 16;
 level2Radius = 150;
 ring2Radius = 200;
@@ -146,7 +155,7 @@ ring4Thickness = 20;
 level4Height = 135;
 kickboardWidthLevel4 = 40;
 
-//createHalfWafer(numberOfBoards, ringRadius, ringThickness, middleRadius, middleThickness, width, depth)
+topHalfWaferCut = 1;
 
 module threeRings() {
     rotate([0,0,35]) {
@@ -157,7 +166,7 @@ module threeRings() {
         level2Radius, 
         level2Height, 
         kickboardWidthLevel2, 
-        bigCollumnRadius*5);
+        ring2Radius * topHalfWaferCut);
     }
     translate([0, 0, level2Height + ring2Thickness]) { 
         rotate([0, 0, 0]) {
@@ -168,7 +177,7 @@ module threeRings() {
             level3Radius, 
             level3Height,
             kickboardWidthLevel3,
-            bigCollumnRadius * 5);
+            ring3Radius * topHalfWaferCut);
         }
         translate([0,0,level3Height + ring3Thickness]) {
             rotate([0,0,0]) {
@@ -179,11 +188,19 @@ module threeRings() {
                 level4Radius,
                 level4Height,
                 kickboardWidthLevel4,
-                bigCollumnRadius * 5);
+                ring4Radius * topHalfWaferCut);
             }
         }
     }
 }
+
+
+
+/* 
+    FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                        CODE OF PERTINENCE TO SECTION F 
+    FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+*/
 
 level0Radius = 180;
 level0NumberOfBoards = 10;
@@ -191,9 +208,8 @@ level0CutOutHeight = 40;
 level0NonCutOutHeight = 200;
 kickboardWidthLevel0 = 30;
 
-//module createKickboards(xTrans, numberOfBoards, width, depth, height)
-
 level0Height = level0NonCutOutHeight + level0CutOutHeight;
+    
 
 module bottomThing() {
    difference() {
@@ -208,16 +224,6 @@ module bottomThing() {
     }
    }
 }
-
-//    module tinyCollumns(height, smallRadius, tinyRadius, protrusion) {
-
-
-translate([bigCollumnRadius + middleTriangleThickness,0, -200]) middleCourtHouse();
-
-translate([0,0,-130]) bottomThing();
-
-translate([0,0,partialCollumnHeight]) threeRings();
-translate([0, 0, partialCollumnHeight/2]) bigPartialCollumn();
 
 middleTriangleRadius = 200;
 middleTriangleThickness = 40;
@@ -235,15 +241,24 @@ module middleCourtHouse() {
             }
         }
     }
-    //middle
-    tinyCollumns(middleCollumnHeight, middleTinyCollumnWidth, middleCollumnWidth, middleCollumnProtrusion);
-    
-    for(i = [-1, 1]) { 
-        translate([0, (middleTriangleRadius*3/5)*i,0]) {
-                tinyCollumns(middleCollumnHeight, middleTinyCollumnWidth, middleCollumnWidth, middleCollumnProtrusion);
-        }
-    }
 }
 
+module currentRender() {
+    translate([sectionARadius + middleTriangleThickness,0, -200]) middleCourtHouse();
+    translate([0,0,-130]) bottomThing();
+    translate([0,0,sectionAHeight]) threeRings();
+    translate([0, 0, sectionAHeight/2]) sectionA();
+}
 
+currentRender();
+
+//    module tinyCollumns(height, smallRadius, tinyRadius, protrusion) {
+
+
+module ornamentedCollumn(height, collumnOuterRadius, collumnOrnamentRadius, protrusion) {
+    difference() {
+        
+            tinyCollumns(height, collumnOuterRadius, collumnOrnamentalRadius, protrusion);
+    }
+} 
 
