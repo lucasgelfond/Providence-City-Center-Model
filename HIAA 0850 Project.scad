@@ -59,7 +59,7 @@
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 */
     sectionARadius = 150;
-    sectionAHeight = 750;
+    sectionAHeight = 600;
     sectionASmallCollumnRadius = 20;
 
     
@@ -85,7 +85,7 @@
     }
     
 sectionANumberOfRings = 8;
-sectionARingBulge = 25;
+sectionARingBulge = 10;
 sectionAThickness = 20;
    
     //Ornamental bands around the section A
@@ -247,6 +247,13 @@ bigMasHeight = 150;
    //    module kickboard(width, depth, height) {
 
    
+   
+windowBarThickness = 3.5;
+
+module windowBar(length) {
+    cube([length, DFKickboardSandwichDepth, windowBarThickness], center = true);
+}
+   
 module kickboardArch() {
        difference() {
        cube([DFWindowLength + DFWindowCollumnExtra * 2, DFKickboardSandwichDepth, DFKickboardArchHeight], center = true);
@@ -256,8 +263,16 @@ module kickboardArch() {
             kickboard(DFWindowLength * DFArchModifier, DFBigKickboardImprint*DFKickboardSandwichDepth + extraCutoff, DFKickboardArchHeight-DFKickboardArchExtraVertical + extraCutoff);     
            }
        }
-       
+       translate([0,0, DFKickboardArchHeight/5]) windowBar(DFWindowLength);
+       for(i = [1, -1 ]) {
+           translate([-DFWindowCollumnExtra/2*i,0,0]) {
+               rotate([0, 90, 0]) {
+                   windowBar(DFKickboardArchHeight);
+               }
+           }
+       }
    }
+   
 
 
 
@@ -298,9 +313,13 @@ module kickboardArch() {
    }
    
    
-     
+   numSectionEMas = 15;
+  
+   
    module masoleum(numMasoleumThings) {
-       translate([((DFWindowFullThick * numMasoleumThings) +(masoluemCollumnRadius*2 )* (numMasoleumThings + 4))/-2,0,0]) {
+       translate([
+       (masoluemCollumnRadius + DFWindowLength+DFWindowCollumnExtra-DFWindowOverlap) * numSectionEMas/-2
+       ,0,0]) {
            for(i = [0: numMasoleumThings]) {
                translate([(masoluemCollumnRadius * 2 + DFWindowLength - DFWindowOverlap), 0, 0] * i) {
                    masoleumCollumns(bigMasHeight, 
@@ -328,19 +347,15 @@ module kickboardArch() {
     EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 */
 
-numSectionEMas = 6;
 
 module sectionE() {
-    for(i = [1, -1]) {
-        translate([sectionARadius, 
-        ((((DFWindowFullThick + DFWindowCollumnExtra) * numSectionEMas - masoluemCollumnRadius/2) + sectionARadius)*i),
-        (bigMasHeight - sectionAThickness)/-2]) {
-            rotate([0,0,270]) {
-                masoleum(numSectionEMas);
-            }
-            translate([0, ((DFWindowLength)*3 + masoluemCollumnRadius*2 - DFWindowCollumnExtra*1.5)*i , 0]) sectionD();
-
+    translate([0, 0,
+    (bigMasHeight - sectionAThickness)/-2]) {
+        rotate([0,0,270]) {
+            masoleum(numSectionEMas);
         }
+        //translate([0, ((DFWindowLength)*3 + masoluemCollumnRadius*2 - DFWindowCollumnExtra*1.5)*i , 0]) sectionD();
+
     }
 }
 
@@ -355,7 +370,6 @@ module sectionD() {
     //translate([0,0,bigMasHeight/2]) cube([DFKickboardSandwichDepth/2,DFKickboardSandwichDepth,bigMasHeight/2], center = true);
 }
 
-currentRender();
 
 
 
@@ -395,6 +409,8 @@ middleCollumnWidth = 25;
 middleTinyCollumnWidth = 5;
 middleCollumnProtrusion = 2;
 
+// module tinyCollumns(collumnHeight, smallRadius, tinyRadius, protrusion, numCollumns) 
+
 
 module middleCourtHouse() {
     translate([-middleTriangleThickness/2,0, middleTriangleRadius/2]) {
@@ -404,16 +420,16 @@ module middleCourtHouse() {
             }
         }
     }
+    //sectionACollumn(100);
 }
 
 //GLOBAL STAGING
 
 module currentRender() {
-    //translate([sectionARadius + middleTriangleThickness,0, -200]) middleCourtHouse();
+    translate([sectionARadius + middleTriangleThickness,0, -200]) middleCourtHouse();
     translate([0,0,(level0Height+sectionAThickness)/-2]) {
         sectionF();
     }
-    translate([0,0,(level0Height+sectionAThickness)/-1 + bigMasHeight]) sectionE();
     translate([0,0,sectionAHeight]) sectionB();
     translate([0, 0, sectionAHeight/2]) sectionA();
     translate([100,50, (level0Height + 15)/-1]) cube([700, 1850, 10], center = true);
@@ -423,7 +439,10 @@ module currentRender() {
 
 }
 
-//currentRender();
+    translate([0,0,(level0Height+sectionAThickness)/-1 + bigMasHeight]) sectionE();
+
+
+currentRender();
 
 
 
