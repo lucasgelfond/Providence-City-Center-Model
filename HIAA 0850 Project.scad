@@ -11,7 +11,7 @@
     extremeCutoff = 100000;
     
     //Amount of sides per cylinder. 
-    $fn = 30;
+    $fn = 50;
     
     
     
@@ -58,36 +58,18 @@
                     CODE OF PERTINENCE TO SECTION A  
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 */
-    sectionARadius = 150;
+    sectionARadius = 160;
     sectionAHeight = 600;
-    sectionASmallCollumnRadius = 20;
-
-    
-    //Play with these to change the look of the ornamental collumns
-    sectionAOrnamentationProtrusion = -0.625;
-    sectionALargeCollumnProtrusion = 100;
-
-   //Radius of the ornamentation cut out of the small large collumns
-    sectionAOrnamentationRadius = 8;
-    
-    //Number of ornamented collumns in section A
-    sectionAOrnamentalCollumns = 15;
-    
-    //Number of cylinders with which to apply ornamentation in Section A
-    sectionANumberOfOrnamentalCollumns = 8;
-
-      
-    module sectionACollumns(height) {
-        difference() {
-        cylinder(r = sectionASmallCollumnRadius, h = height, center = true);
-        tinyCollumns(height+extraCutoff, sectionASmallCollumnRadius, sectionAOrnamentationRadius, sectionAOrnamentationProtrusion, sectionANumberOfOrnamentalCollumns);
-        }
-    }
     
 sectionANumberOfRings = 8;
-sectionARingBulge = 10;
+sectionARingBulge = -2.5;
 sectionAThickness = 20;
-   
+    
+    
+    sectionAFluteRadius = 40;
+    sectionAFluteProtrusion = -0.75;
+    sectionAFlutes = 15;
+       
     //Ornamental bands around the section A
     module sectionARings() {
         for(i = [0: sectionANumberOfRings]) {
@@ -97,17 +79,18 @@ sectionAThickness = 20;
             }
         }
     }      
+    
+       // module tinyCollumns(collumnHeight, smallRadius, tinyRadius, protrusion, numCollumns) {
+
     //Creates big section with the double ornamentation and adds small collumns around it
     module sectionA() {
-        cylinder(r = sectionARadius, h = sectionAHeight,
-        center = true);
-        for(i = [0: sectionAOrnamentalCollumns]) {
-            rotate(
-            (i * 360 / sectionAOrnamentalCollumns) * [0, 0, 1]) {
-                translate([sectionARadius - sectionASmallCollumnRadius / sectionALargeCollumnProtrusion, 0, 0]) {
-                    sectionACollumns(sectionAHeight);
-            }
-        }
+        difference() {
+            cylinder(r = sectionARadius, h = sectionAHeight,
+            center = true);
+            tinyCollumns(sectionAHeight, sectionARadius, sectionAFluteRadius, 
+            sectionAFluteProtrusion, sectionAFlutes);
+            
+        
     }
     sectionARings();
 }
@@ -208,6 +191,23 @@ module sectionB() {
     }
 }
 
+topperScale = 1.25;
+topperRadius = 20;
+topperHeight = 250;
+
+module topper() {
+    scale([1, 1, topperScale]) {
+        difference() {
+            sphere(r = level4Radius);
+            translate([0,0,-level4Radius]) 
+            cube([level4Radius*2, level4Radius*2, level4Radius*2],  center = true);
+        }
+    }
+    translate([0,0,(topperRadius*topperScale/-2)+topperHeight]) {
+        cylinder(r = topperRadius, h = topperHeight, center = true);
+    }
+}
+
 /* 
     DEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDEDE
                         CODE OF PERTINENCE TO SECTIONS D & E
@@ -224,6 +224,7 @@ bigMasHeight = 150;
 
 
 //to be completely honest, a lot of the alignments get fucked up when you play with these, but I don't need to debug them (yet) so I'm going to leave them
+
 
    DFWindowLength = 60;
    DFArchModifier = 0.75;
@@ -254,7 +255,7 @@ module windowBar(length) {
     cube([length, DFKickboardSandwichDepth, windowBarThickness], center = true);
 }
    
-module kickboardArch() {
+module kickboardArch(switch) {
        difference() {
        cube([DFWindowLength + DFWindowCollumnExtra * 2, DFKickboardSandwichDepth, DFKickboardArchHeight], center = true);
            translate([0, 
@@ -263,11 +264,13 @@ module kickboardArch() {
             kickboard(DFWindowLength * DFArchModifier, DFBigKickboardImprint*DFKickboardSandwichDepth + extraCutoff, DFKickboardArchHeight-DFKickboardArchExtraVertical + extraCutoff);     
            }
        }
-       translate([0,0, DFKickboardArchHeight/5]) windowBar(DFWindowLength);
-       for(i = [1, -1 ]) {
-           translate([-DFWindowCollumnExtra/2*i,0,0]) {
-               rotate([0, 90, 0]) {
-                   windowBar(DFKickboardArchHeight);
+       if(switch == 1) {
+           translate([0,0, DFKickboardArchHeight/5]) windowBar(DFWindowLength);
+           for(i = [1, -1 ]) {
+               translate([-DFWindowCollumnExtra/2*i,0,0]) {
+                   rotate([0, 90, 0]) {
+                       windowBar(DFKickboardArchHeight);
+                   }
                }
            }
        }
@@ -276,7 +279,7 @@ module kickboardArch() {
 
 
 
-   module kickboardSandwich() {
+   module kickboardSandwich(switch) {
        difference() {
            cube([DFWindowLength + DFWindowCollumnExtra * 2, DFKickboardSandwichDepth, DFWindowFullThick], center = true);
            translate(
@@ -296,7 +299,7 @@ module kickboardArch() {
                }
            }
        }
-       translate([0,0, bigMasHeight/-2]) kickboardArch();
+       translate([0,0, bigMasHeight/-2]) kickboardArch(switch);
        
    }
    
@@ -316,10 +319,8 @@ module kickboardArch() {
    numSectionEMas = 15;
   
    
-   module masoleum(numMasoleumThings) {
-       translate([
-       (masoluemCollumnRadius + DFWindowLength+DFWindowCollumnExtra-DFWindowOverlap) * numSectionEMas/-2
-       ,0,0]) {
+   module masoleum(numMasoleumThings, switch) {
+       translate([((masoluemCollumnRadius + DFWindowLength+DFWindowCollumnExtra-DFWindowOverlap) * numMasoleumThings)/-2,0,0]) {
            for(i = [0: numMasoleumThings]) {
                translate([(masoluemCollumnRadius * 2 + DFWindowLength - DFWindowOverlap), 0, 0] * i) {
                    masoleumCollumns(bigMasHeight, 
@@ -334,11 +335,30 @@ module kickboardArch() {
                (masoluemCollumnRadius) * 2 * (i-0.5) + DFWindowLength * (i-0.5) - DFWindowOverlap * i + DFWindowOverlap/2, 
                DFKickboardSandwichDepth/-2, 
                (bigMasHeight-DFWindowFullThick)/2]) {
-                   kickboardSandwich();
+                   kickboardSandwich(switch);
            }
        }
+       
+      translate([((masoluemCollumnRadius + DFWindowLength+DFWindowCollumnExtra-DFWindowOverlap) * numMasoleumThings)/2,
+       DFKickboardSandwichDepth/-2, (bigMasHeight+DFTopRoofThick)/2]) {
+          cube([((masoluemCollumnRadius + DFWindowLength+DFWindowCollumnExtra-DFWindowOverlap) * numMasoleumThings)
+           + masoluemCollumnRadius*2, DFKickboardSandwichDepth, DFTopRoofThick], center = true);
+          translate([0, DFTopPoking/2, (DFTopPokeOutThick+DFTopRoofThick)/2]) {
+              cube([(masoluemCollumnRadius + DFWindowLength+DFWindowCollumnExtra-DFWindowOverlap) * numMasoleumThings + masoluemCollumnRadius*2, DFKickboardSandwichDepth +DFTopPoking , DFTopPokeOutThick], center = true);
+          }
+      }
    }
    }
+   
+   DFLength = (masoluemCollumnRadius + DFWindowLength+DFWindowCollumnExtra-DFWindowOverlap) * numSectionEMas + masoluemCollumnRadius*2;
+   
+   
+   //(masoluemCollumnRadius * 5 + DFWindowLength+DFWindowCollumnExtra-DFWindowOverlap) * 3 + 
+   
+   
+  DFTopRoofThick = 15;
+   DFTopPokeOutThick = 15;
+   DFTopPoking = 20;
   
 
 /* 
@@ -352,23 +372,100 @@ module sectionE() {
     translate([0, 0,
     (bigMasHeight - sectionAThickness)/-2]) {
         rotate([0,0,270]) {
-            masoleum(numSectionEMas);
+            masoleum(numSectionEMas, 0);
         }
         //translate([0, ((DFWindowLength)*3 + masoluemCollumnRadius*2 - DFWindowCollumnExtra*1.5)*i , 0]) sectionD();
 
     }
 }
 
-module sectionD() {
-    for(i = [0 : 3]) {
-        translate([DFKickboardSandwichDepth/2 * i,0,0]) {
-               rotate([0, 0, 270]) {
-                masoleum(3);
-            }
+/*
+ DFWindowLength = 60;
+   DFArchModifier = 0.75;
+   DFSmallKickboardWidth = 10;
+   DFWindowKickboards = 3;
+   DFWindowMiddleHeight = 25;
+   DFWindowCrustThickness = 10;
+   DFKickboardSandwichDepth = 150;
+   
+   //I've been debugging these FOREVER and they don't work, I'm honestly just going to leave them and deal with it later
+   DFSmallKickboardImprint = 0.3;
+   DFBigKickboardImprint = 1;
+
+   DFWindowCollumnExtra = 20;
+   DFWindowOverlap = 0;
+
+   DFWindowFullThick = DFWindowMiddleHeight + DFWindowCrustThickness;
+   DFKickboardArchHeight = bigMasHeight - DFWindowFullThick;
+   DFKickboardArchExtraVertical = 3;
+  DFTopRoofThick = 15;
+   DFTopPokeOutThick = 15;
+*/
+
+sectionDDoubleWindowWidth = 15;
+
+module sectionDTopWindowCutouts() {    
+        for(i = [1, - 1]) {
+            translate([0,sectionDDoubleWindowWidth*i,0]) cube([extremeCutoff, sectionDDoubleWindowWidth, DFWindowMiddleHeight], center = true);
         }
     }
-    //translate([0,0,bigMasHeight/2]) cube([DFKickboardSandwichDepth/2,DFKickboardSandwichDepth,bigMasHeight/2], center = true);
+    
+pyramidXSetback = 100;
+    pyramidBottomThickness = 10;
+    pyramidHeight = 65;
+    
+module sectionDPyramid() {
+    cube([(DFKickboardSandwichDepth*(sectionDRows+1)/2)-pyramidXSetback, (masoluemCollumnRadius * 8 + DFWindowLength* 3), pyramidBottomThickness], center = true);
+    
+    translate([0,0, pyramidHeight/2 + pyramidBottomThickness/2]) {
+        
+        scale([1,(masoluemCollumnRadius * 8 + DFWindowLength* 3)/((DFKickboardSandwichDepth*(sectionDRows+1)/2)-pyramidXSetback), 1]) 
+        
+        rotate([0,0,45]) 
+
+        cylinder(r1 = ((DFKickboardSandwichDepth*(sectionDRows+1)/2)-pyramidXSetback)/2, r2 = 0, h = pyramidHeight, $fn = 4, center = true);
+    }
 }
+
+
+sectionDRows = 6;
+
+module sectionD() {
+    for(i = [0 : sectionDRows-1]) {
+        translate([DFKickboardSandwichDepth/2 * i,0,0]) {
+               rotate([0, 0, 270]) {
+                masoleum(3, 1);
+            }
+        }
+    translate([0,0,(bigMasHeight/2 + (DFWindowMiddleHeight+DFWindowCrustThickness*2)/2 + DFTopRoofThick + DFTopPokeOutThick)]) {
+        difference() {
+                translate([DFKickboardSandwichDepth*(sectionDRows/2)/4,0,0]) 
+            cube([DFKickboardSandwichDepth*(sectionDRows+1)/2, 
+                (masoluemCollumnRadius * 8 + DFWindowLength* 3)
+                , DFWindowMiddleHeight + DFWindowCrustThickness*2 ], center = true);
+                union() {
+                    translate([DFKickboardSandwichDepth,0,0]) {
+                        sectionDTopWindowCutouts();
+                        for(i = [1, -1]) {
+                            translate([0, DFWindowLength*2*i, 0]) {
+                                sectionDTopWindowCutouts();
+                            }
+                        }
+                    }
+                }
+            }
+            translate([DFKickboardSandwichDepth*(10/3)/8,0,(pyramidBottomThickness/-0.5 + pyramidHeight)/2]) 
+            sectionDPyramid();
+        }
+    }
+}
+
+    
+    
+    //translate([0,0,bigMasHeight/2]) cube([DFKickboardSandwichDepth/2,DFKickboardSandwichDepth,bigMasHeight/2], center = true);
+
+
+//sectionD();
 
 
 
@@ -403,7 +500,7 @@ module sectionF() {
 }
 
 middleTriangleRadius = 200;
-middleTriangleThickness = 40;
+middleTriangleThickness = 100;
 middleCollumnHeight = 120;
 middleCollumnWidth = 25;
 middleTinyCollumnWidth = 5;
@@ -413,7 +510,7 @@ middleCollumnProtrusion = 2;
 
 
 module middleCourtHouse() {
-    translate([-middleTriangleThickness/2,0, middleTriangleRadius/2]) {
+    translate([middleTriangleThickness/-1.25,0, middleTriangleRadius/2]) {
         scale([1, 1, 0.4])  {
             rotate([90, 30, 90]) {
                 cylinder(r = middleTriangleRadius, h = middleTriangleThickness, $fn = 3);
@@ -426,20 +523,28 @@ module middleCourtHouse() {
 //GLOBAL STAGING
 
 module currentRender() {
-    translate([sectionARadius + middleTriangleThickness,0, -200]) middleCourtHouse();
+    //translate([sectionARadius + middleTriangleThickness,0, -200]) middleCourtHouse();
     translate([0,0,(level0Height+sectionAThickness)/-2]) {
         sectionF();
     }
     translate([0,0,sectionAHeight]) sectionB();
     translate([0, 0, sectionAHeight/2]) sectionA();
-    translate([100,50, (level0Height + 15)/-1]) cube([700, 1850, 10], center = true);
+    translate([-50,50, (level0Height + 15)/-1]) cube([800, 1850, 10], center = true);
+  translate([sectionARadius/-1,0,(level0Height+sectionAThickness)/-1 + bigMasHeight]) {
+     sectionE();
+        for(i = [1, -1]) {
+            translate([0,(DFLength/2-(masoluemCollumnRadius * 8 + DFWindowLength* 3)/2)*i,(level0Height+sectionAThickness)/-4]) sectionD();
+        }
+    }
+    
+    translate([0,0, sectionAHeight+level2Height+level3Height+level4Height*(1+topperScale/4)]) topper();
 
     
 
 
 }
 
-    translate([0,0,(level0Height+sectionAThickness)/-1 + bigMasHeight]) sectionE();
+  
 
 
 currentRender();
