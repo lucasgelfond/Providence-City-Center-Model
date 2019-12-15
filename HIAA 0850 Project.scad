@@ -22,12 +22,15 @@
                 (i * 360 / numCollumns) * 
                 [0, 0, 1]) {
                     translate([smallRadius - (tinyRadius * protrusion), 0, 0]) {
-                        cylinder(r = tinyRadius, h = collumnHeight, center = true);
+                        minkowski() {
+                            cylinder(r = tinyRadius, h = collumnHeight-(tinyRadius*4), center = true);
+                            translate([0,0, 0]) rotate([0, 90, 0]) cylinder(r = tinyRadius, h = tinyRadius*2, $fn = 10);
+                        }
                     }
                 }
             }
     }
-    
+        
     
     //Creates a series of kickboard shapes to use around a cylinder
     module createKickboards(xTrans, numberOfBoards, width, depth, height) {    
@@ -59,23 +62,24 @@
     AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 */
     sectionARadius = 160;
-    sectionAHeight = 600;
+    sectionAHeight = 770;
     
-sectionANumberOfRings = 8;
+    
+sectionANumberOfRings = 10;
 sectionARingBulge = -2.5;
-sectionAThickness = 20;
+sectionAThickness = 16;
     
     
-    sectionAFluteRadius = 40;
-    sectionAFluteProtrusion = -0.75;
+    sectionAFluteRadius =  12;
+    sectionAFluteProtrusion = 1;
     sectionAFlutes = 15;
        
     //Ornamental bands around the section A
     module sectionARings() {
-        for(i = [0: sectionANumberOfRings]) {
+        for(i = [0.5: sectionANumberOfRings-0.5]) {
             translate([0,0, sectionAHeight/sectionANumberOfRings * i - 
             sectionAHeight / 2]) {
-                cylinder(r = sectionARadius + sectionARingBulge, h = sectionAThickness, center = true);
+                cylinder(r = sectionARadius + sectionARingBulge, h = sectionAThickness, center = true, $fn = 50);
             }
         }
     }      
@@ -86,7 +90,7 @@ sectionAThickness = 20;
     module sectionA() {
         difference() {
             cylinder(r = sectionARadius, h = sectionAHeight,
-            center = true);
+            center = true, $fn = 100);
             tinyCollumns(sectionAHeight, sectionARadius, sectionAFluteRadius, 
             sectionAFluteProtrusion, sectionAFlutes);
             
@@ -131,81 +135,151 @@ module createWindowedCylinder(numberOfBoards, ringRadius, ringThickness, middleR
 
 
 
-numberOfBoardsLevel2 = 16;
-level2Radius = 150;
-ring2Radius = 200;
-ring2Thickness = 10;
-level2Height = 125;
-kickboardWidthLevel2 = 40;
+//level 0
+numberOfBoardsLevel0 = 16;
+kickboardWidthLevel0 = 40;
+
+bread0Radius = 167;
+bread0Height = 41;
+meat0Radius = 164;
+meat0Height = 96;
+
+//level 1
+
+numberOfBoardsLevel1 = 16;
+kickboardWidthLevel1 = 40;
+
+bread1Radius = 172;
+bread1Height = 41;
+meat1Radius = 161;
+meat1Height = 99;
+
+//level 2
+
+numberOfBoardsLevel2 = 8;
+kickboardWidthLevel2 = 45;
+
+bread2Radius = 138;
+bread2Height = 59;
+meat2Radius = 117;
+meat2Height = 107;
+
+//level 3
 
 numberOfBoardsLevel3 = 8;
-level3Radius = 125;
-ring3Radius = 180;
-ring3Thickness = 35;
-level3Height = 110;
-kickboardWidthLevel3 = 45;
+kickboardWidthLevel3 = 40;
 
-numberOfBoardsLevel4 = 6;
-ring4Radius = 140;
-level4Radius = 100;
-ring4Thickness = 20;
-level4Height = 135;
-kickboardWidthLevel4 = 40;
+bread3Radius = 113;
+meat3Radius = 98;
+bread3Height = 45;
+meat3Height = 100;
+
+//module createWindowedCylinder(numberOfBoards, breadRadius, breadThickness, middleRadius, middleThickness, width, depth) {
+
 
 sectionBWaferCut = 1;
 
 module sectionB() {
-    rotate([0,0,35]) {
+    rotate([0,0,0]) {
         createWindowedCylinder(
-        numberOfBoardsLevel2, 
-        ring2Radius, 
-        ring2Thickness, 
-        level2Radius, 
-        level2Height, 
-        kickboardWidthLevel2, 
-        ring2Radius * sectionBWaferCut);
+        numberOfBoardsLevel0, 
+        bread0Radius, 
+        bread0Height, 
+        meat0Radius, 
+        meat0Height, 
+        kickboardWidthLevel0, 
+        bread0Radius * sectionBWaferCut);
     }
-    translate([0, 0, level2Height + ring2Thickness]) { 
+    translate([0, 0, meat0Height + bread0Height]) { 
         rotate([0, 0, 0]) {
             createWindowedCylinder(
-            numberOfBoardsLevel3,
-            ring3Radius, 
-            ring3Thickness,
-            level3Radius, 
-            level3Height,
-            kickboardWidthLevel3,
-            ring3Radius * sectionBWaferCut);
+                numberOfBoardsLevel1, 
+                bread1Radius, 
+                bread1Height, 
+                meat1Radius, 
+                meat1Height, 
+                kickboardWidthLevel1, 
+                bread1Radius * sectionBWaferCut);
         }
-        translate([0,0,level3Height + ring3Thickness]) {
+        translate([0,0,meat1Height + bread1Height]) {
             rotate([0,0,0]) {
                 createWindowedCylinder(
-                numberOfBoardsLevel4,
-                ring4Radius,
-                ring4Thickness,
-                level4Radius,
-                level4Height,
-                kickboardWidthLevel4,
-                ring4Radius * sectionBWaferCut);
+                numberOfBoardsLevel2,
+                bread2Radius,
+                bread2Height,
+                meat2Radius,
+                meat2Height,
+                kickboardWidthLevel2,
+                bread2Radius * sectionBWaferCut);
+            }
+            translate([0,0,meat2Height + bread2Height]) {
+                     rotate([0,0,0]) {
+                        createWindowedCylinder(
+                        numberOfBoardsLevel3,
+                        bread3Radius,
+                        bread3Height,
+                        meat3Radius,
+                        meat3Height,
+                        kickboardWidthLevel3,
+                        bread3Radius * sectionBWaferCut);
+                }
             }
         }
     }
 }
 
-topperScale = 1.25;
-topperRadius = 20;
-topperHeight = 250;
+topperScale = 1.27;
+topperRadius = 24;
+topperHeight = 92;
+
+
+topperRingWidth = 6.5;
+topperRingThick = 15;
+numTopperRings = 10;
+
+topperRingRadius = topperRingThick/2 + meat3Radius;
+
+
+module topperRing() {
+    difference() {
+        rotate([90,0,90]) {
+            scale([1, 1.25, 1]) {
+                difference() {
+                    cylinder(r = topperRingRadius, h = topperRingWidth, center = true);
+                    cylinder(r = topperRingRadius - topperRingThick/2, h = topperRingWidth+extraCutoff, 
+                    center = true);
+                }
+            }
+        }
+        union() {
+            translate([0,0,topperScale*topperRingRadius/-1]) cube([topperRingWidth*2,topperScale*topperRingRadius*2, topperScale*topperRingRadius*2], center = true);
+            translate([0,topperScale*topperRingRadius/2,topperScale*topperRingRadius/2]) cube([topperRingWidth*2, topperScale*topperRingRadius, topperScale*topperRingRadius], center = true);
+        }
+    }
+}
+
+
+module topperRings() {
+    for(i = [1:numTopperRings]) {
+        rotate([0,0,360/numTopperRings*i]) topperRing();
+    }
+}
+
+
+
 
 module topper() {
     scale([1, 1, topperScale]) {
         difference() {
-            sphere(r = level4Radius);
-            translate([0,0,-level4Radius]) 
-            cube([level4Radius*2, level4Radius*2, level4Radius*2],  center = true);
+            sphere(r = meat3Radius);
+            translate([0,0,-meat3Radius]) 
+            cube([meat3Radius*2, meat3Radius*2, meat3Radius*2],  center = true);
         }
     }
-    translate([0,0,(topperRadius*topperScale/-2)+topperHeight]) {
+    translate([0,0,(topperRadius*topperScale)+topperHeight*1.5]) {
         cylinder(r = topperRadius, h = topperHeight, center = true);
     }
+    topperRings();
 }
 
 /* 
@@ -476,35 +550,35 @@ module sectionD() {
     FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 */
 
-level0Radius = 180;
-level0NumberOfBoards = 10;
-level0CutOutHeight = 40;
-level0NonCutOutHeight = 200;
-kickboardWidthLevel0 = 30;
+//level0Radius = 180;
+//level0NumberOfBoards = 10;
+//level0CutOutHeight = 40;
+//level0NonCutOutHeight = 200;
+//kickboardWidthLevel0 = 30;
 
-level0Height = level0NonCutOutHeight + level0CutOutHeight;
+//level0Height = level0NonCutOutHeight + level0CutOutHeight;
     
 
-module sectionF() {
-   difference() {
-    cylinder(r = level0Radius, h = level0Height, center = true);
-    translate([0,0, (level0NonCutOutHeight-kickboardWidthLevel0)/2 - extraCutoff]) { 
-     createKickboards(
-    level0Radius, 
-    level0NumberOfBoards, 
-    kickboardWidthLevel0, 
-    level0Radius * 5, 
-    level0CutOutHeight);
-    }
-   }
-}
-
-middleTriangleRadius = 200;
-middleTriangleThickness = 100;
-middleCollumnHeight = 120;
-middleCollumnWidth = 25;
-middleTinyCollumnWidth = 5;
-middleCollumnProtrusion = 2;
+//module sectionF() {
+//   difference() {
+//    cylinder(r = level0Radius, h = level0Height, center = true);
+//    translate([0,0, (level0NonCutOutHeight-kickboardWidthLevel0)/2 - extraCutoff]) { 
+//     createKickboards(
+//    level0Radius, 
+//    level0NumberOfBoards, 
+//    kickboardWidthLevel0, 
+//    level0Radius * 5, 
+//    level0CutOutHeight);
+//    }
+//   }
+//}
+//
+//middleTriangleRadius = 200;
+//middleTriangleThickness = 100;
+//middleCollumnHeight = 120;
+//middleCollumnWidth = 25;
+//middleTinyCollumnWidth = 5;
+//middleCollumnProtrusion = 2;
 
 // module tinyCollumns(collumnHeight, smallRadius, tinyRadius, protrusion, numCollumns) 
 
@@ -523,9 +597,9 @@ module middleCourtHouse() {
 //GLOBAL STAGING
 
 module currentRender() {
-    //translate([sectionARadius + middleTriangleThickness,0, -200]) middleCourtHouse();
+    translate([sectionARadius + middleTriangleThickness,0, -200]) middleCourtHouse();
     translate([0,0,(level0Height+sectionAThickness)/-2]) {
-        sectionF();
+        //sectionF();
     }
     translate([0,0,sectionAHeight]) sectionB();
     translate([0, 0, sectionAHeight/2]) sectionA();
@@ -539,15 +613,24 @@ module currentRender() {
     
     translate([0,0, sectionAHeight+level2Height+level3Height+level4Height*(1+topperScale/4)]) topper();
 
-    
-
-
 }
 
+module printA() {
+    translate([0, 0, sectionAHeight/2]) sectionA();
+}
+
+toppersHeight = bread0Height + meat0Height + bread1Height + meat1Height + bread2Height + meat2Height + bread3Height + meat3Height;
+
+module printB() {
+    sectionB();
+    translate([0,0, toppersHeight]) topper();
+}
   
+printB();
+
+//currentRender();
 
 
-currentRender();
 
 
 
