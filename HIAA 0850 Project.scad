@@ -581,44 +581,74 @@ module sectionDBottom() {
     FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 */
 
-//level0Radius = 180;
-//level0NumberOfBoards = 10;
-//level0CutOutHeight = 40;
-//level0NonCutOutHeight = 200;
-//kickboardWidthLevel0 = 30;
+level0Radius = 178;
+level0NumberOfBoards = 14;
+level0CutOutHeight = 32;
+level0NonCutOutHeight = 359;
+kickboardWidthLevel0F = 20;
 
-//level0Height = level0NonCutOutHeight + level0CutOutHeight;
+level0Height = level0NonCutOutHeight + level0CutOutHeight;
+
+level0RingRadius = 186;
+level0RingHeight = 32;
     
 
-//module sectionF() {
-//   difference() {
-//    cylinder(r = level0Radius, h = level0Height, center = true);
-//    translate([0,0, (level0NonCutOutHeight-kickboardWidthLevel0)/2 - extraCutoff]) { 
-//     createKickboards(
-//    level0Radius, 
-//    level0NumberOfBoards, 
-//    kickboardWidthLevel0, 
-//    level0Radius * 5, 
-//    level0CutOutHeight);
-//    }
-//   }
-//}
-//
-middleTriangleRadius = 200;
-middleTriangleThickness = 100;
-middleCollumnHeight = 120;
+module sectionF() {
+   difference() {
+        cylinder(r = level0Radius, h = level0Height, center = true);
+        translate([0,0, (level0NonCutOutHeight-kickboardWidthLevel0)/2 - extraCutoff]) { 
+         for(i = [0: level0NumberOfBoards]) {
+              rotate([0,0, 360 / level0NumberOfBoards] * [0, 0, i]) {
+                  translate([0,level0Radius/-2,0]) cube([kickboardWidthLevel0F,level0Radius*2,level0CutOutHeight], center = true);
+                }
+            }
+     
+        }
+    }
+    translate([0,0,(level0Height+level0RingHeight)/2]) {
+        cylinder(r = level0RingRadius, h = level0RingHeight, center = true);
+    }
+    translate([0,100,0]) {
+        translate([0,level0Radius,(level0CutOutHeight*3+middleCollumnHeight*2+dCollumnSandwichBreadHeight-dTotalHeight)/-2]) sectionD();
+        translate([0,0,(level0Height-middleCollumnHeight*2-level0CutOutHeight+level0RingHeight)/2]) rotate([0,0,270]) middleCourtHouse();
+        for(i = [-1, 1]) {
+            translate([120*i,level0Radius,-150]) thrownTogetherShitLol();
+        }
+    }
+    
+    translate([0,level0Radius,(level0NonCutOutHeight/2+stairHeight*1.20)/-2]) {
+            dStairs();
+    }
+   
+}
+
+
+module thrownTogetherShitLol() {
+    cube([40, 100, 100], center = true);
+}
+
+
+middleTriangleRadius = 150;
+middleTriangleThickness = 150;
+middleCollumnHeight = 100;
 middleCollumnWidth = 25;
 middleTinyCollumnWidth = 5;
 middleCollumnProtrusion = 2;
 
+middleTriangleBorder = 15;
+middleCutDepth = 15;
+
 // module tinyCollumns(collumnHeight, smallRadius, tinyRadius, protrusion, numCollumns) 
 
-
 module middleCourtHouse() {
-    translate([middleTriangleThickness/-1.25,0, middleTriangleRadius/2]) {
-        scale([1, 1, 0.4])  {
+    translate([middleTriangleThickness/-1.25,0, 0]) {
+        scale([1, 1, 0.25])  {
             rotate([90, 30, 90]) {
-                cylinder(r = middleTriangleRadius, h = middleTriangleThickness, $fn = 3);
+                difference() {
+                    cylinder(r = middleTriangleRadius, h = middleTriangleThickness, $fn = 3, center = true);
+                    translate([0,0,middleTriangleThickness/-2]) cylinder(r = middleTriangleRadius-middleTriangleBorder*2, h = middleCutDepth+extraCutoff, $fn = 3, center = true);
+                }
+
             }
         }
     }
@@ -626,6 +656,68 @@ module middleCourtHouse() {
 }
 
 //GLOBAL STAGING
+
+dCollumnRadius = 12; 
+dTotalHeight = 225;
+dCollumnCapitalExtra = 10;
+dCollumnHCapitalThick = 20; 
+dBigRadiusExtra = 2;
+
+module dCollumn() {
+    cylinder(r2 = dCollumnRadius, r1 = dCollumnRadius + dBigRadiusExtra, h = dTotalHeight-2*dCollumnHCapitalThick, center = true);
+    for(i = [1, -1]) {
+        translate([0,0,(dTotalHeight-dCollumnHCapitalThick)/2*i]) {
+            cube([dCollumnRadius*2+dCollumnCapitalExtra, dCollumnRadius*2+dCollumnCapitalExtra, dCollumnHCapitalThick], center = true);
+        }
+    }
+}
+
+dCollumnSandwichBreadHeight = 10;
+
+module dCollumnSandwich() {
+    for(i = [-1.5, -0.5, 0.5, 1.5]) {
+        translate([(level0Radius/4+15)*i,0,0]) {
+            dCollumn();
+        }
+    }
+    for(i = [-1, 1]) {
+        translate([0,0,(dCollumnSandwichBreadHeight+dTotalHeight)/2*i]) {
+            cube([middleTriangleRadius*1.75,dCollumnCapitalExtra+dCollumnRadius*2, dCollumnSandwichBreadHeight], center = true);
+        }
+    }
+}
+
+stairWidth = 300;
+stairInitialHeight = -5;
+stairVerticalIncrement = 2.5;
+stairHorizontalIncrement = 10;
+stairs = 20;
+stairLength = stairHorizontalIncrement * stairs;
+stairHeight = stairVerticalIncrement * stairs;
+
+module dStairs() {
+    rotate([0,180,0]) {
+        difference() {
+            for(i = [1 : stairs]) {
+                translate([0,stairHorizontalIncrement/2*i,stairInitialHeight+stairVerticalIncrement*(i-1)*2]) 
+                cube([stairWidth, stairHorizontalIncrement*i, stairInitialHeight + stairVerticalIncrement*i], center = true);
+            }
+                    translate([0,0,stairHeight*2]) cube([stairWidth*2, stairLength*2, stairHeight], center = true);
+
+        }
+    }
+}
+
+//dStairs();
+sectionF();
+
+
+module sectionD() {
+    dCollumnSandwich();
+}
+
+
+
 
 module currentRender() {
     //translate([sectionARadius + middleTriangleThickness,0, -200]) middleCourtHouse();
@@ -636,6 +728,7 @@ module currentRender() {
     
 }
 
+//I should not that, in order to get a model for printB (I think) I did break printA in the process.....
 module printA() {
     translate([0, 0, sectionAHeight/2]) sectionA();
 }
@@ -660,14 +753,11 @@ module printC() {
         }
     }
 
-//printB();
+module printD() {
+    sectionF();
+   translate([200,0,0])  middleCourtHouse();
+}
 
 
-
-printC();
-
-
-//printC();
-
-
+//printD();
 
