@@ -171,8 +171,8 @@ kickboardWidthLevel3 = 40;
 
 bread3Radius = 113;
 meat3Radius = 98;
-bread3Height = 45;
-meat3Height = 100;
+bread3Height = 20;
+meat3Height = 30;
 
 //module createWindowedCylinder(numberOfBoards, breadRadius, breadThickness, middleRadius, middleThickness, width, depth) {
 
@@ -758,6 +758,8 @@ module printD() {
    translate([200,0,0])  middleCourtHouse();
 }
 
+
+printB();
 
 //printD();
 
