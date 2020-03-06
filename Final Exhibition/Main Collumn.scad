@@ -1,3 +1,13 @@
+/*
+additions/changes: 
+- mullions on top (correct?)
+- 8 sections/stories
+- half circle-rounding at top and not on bottom
+- 16 indents/16 raised areas
+- pediment added but needs help very seriously
+- note: yes! we can do more sides! 
+*/
+
  manifoldCut = 0.0001;
  
  sfn = 30;

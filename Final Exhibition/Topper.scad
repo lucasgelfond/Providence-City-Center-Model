@@ -1,14 +1,22 @@
+/*
+my notes/fixes :
+- dimensions fixed and attempted to make better; are these proportions better? 
+- how do I do parapet cornices? what is the geometry of them? what are examples of similar hood cornices? let's play with what this looks like together
+- openings changed from rounded to square 
+- code really cleaned up so opening change should work—you say "14 openings" but is that for all of these, or just one level? let's decide level by level
+- dome bands actually do spring up from the openings, I think 
+- choragic monument made, this was the biggest change:
+    - is there a center there? or is it supposed to be open
+    - does the ledge bit have a curve? i'm confused
+    - doesn't totally square away with specifics of diagram Jon gave me/I found online/
+    
+
+*/
 
 sfn = 30;
 spheresfn = 20;
 manifold = 1;
 
-/*
-my notes:
-- are these proportions better? 
-- how do I do parapet cornices? what is the geometry of them? what are examples of similar hood cornices? let's play with what this looks like together
-
-*/
 topper();
 
 module topper() {
