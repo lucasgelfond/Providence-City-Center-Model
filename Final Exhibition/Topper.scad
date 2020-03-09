@@ -15,7 +15,7 @@ my notes/fixes :
 
 sfn = 30;
 spheresfn = 20;
-manifold = 1;
+manifold = 0.0001;
 
 topper();
 
@@ -172,11 +172,12 @@ module dome() {
     domeRings();
 }
 
+
 numDomeRings = 10;
 
 module domeRings() {
     for(i = [1:numDomeRings]) { 
-        rotate([0, 0, 360/numDomeRings*i]) domeRing();
+        rotate([0, 0, (360/numDomeRings)*i]) translate([manifold, manifold, 0]) domeRing();
     }
 }
 

@@ -14,6 +14,7 @@
     $fn = 50;
     
     
+      masoleum(2, 1);
     
     //Loop that makes all of the ornamentation for the small collumns.
     module tinyCollumns(collumnHeight, smallRadius, tinyRadius, protrusion, numCollumns) {
@@ -393,6 +394,8 @@ module kickboardArch(switch) {
    numSectionEMas = 21;
   
    
+ 
+   
    module masoleum(numMasoleumThings, switch) {
        translate([((masoluemCollumnRadius + DFWindowLength+DFWindowCollumnExtra-DFWindowOverlap) * numMasoleumThings)/-2,0,0]) {
            for(i = [0: numMasoleumThings]) {
@@ -409,7 +412,7 @@ module kickboardArch(switch) {
                (masoluemCollumnRadius) * 2 * (i-0.5) + DFWindowLength * (i-0.5) - DFWindowOverlap * i + DFWindowOverlap/2, 
                DFKickboardSandwichDepth/-2, 
                (bigMasHeight-DFWindowFullThick)/2]) {
-                   kickboardSandwich(switch);
+                   #kickboardSandwich(switch);
            }
        }
        
@@ -523,6 +526,7 @@ module sectionD() {
   DFTopRoofThick = 15;
    DFTopPokeOutThick = 15;
 */
+
 
 
 module sectionDBottom() {                
@@ -709,7 +713,6 @@ module dStairs() {
 }
 
 //dStairs();
-sectionF();
 
 
 module sectionD() {
@@ -759,7 +762,8 @@ module printD() {
 }
 
 
-printB();
+
+
 
 //printD();
 
