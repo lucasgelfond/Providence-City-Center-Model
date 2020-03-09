@@ -1,7 +1,7 @@
 /*
 my notes/fixes :
 - dimensions fixed and attempted to make better; are these proportions better? 
-- how do I do parapet cornices? what is the geometry of them? what are examples of similar hood cornices? let's play with what this looks like together
+- how do I do parapet cornices? what is the geometry of them? what are examples of similar hood cornices? let's play with what this looks like together, still a bit confused on how these work
 - openings changed from rounded to square 
 - code really cleaned up so opening change should work—you say "14 openings" but is that for all of these, or just one level? let's decide level by level
 - dome bands actually do spring up from the openings, I think 
